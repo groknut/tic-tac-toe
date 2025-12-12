@@ -21,7 +21,7 @@ public:
 	bool isCellEmpty(const int& row,const int& col) const;
 
 	bool isFull() const;
-	    
+	char getEmpty() const { return empty; }	    
     int getSize() const;
     void setCell(const int& y, const int& x, const char& mark);
 	const char& getCell(const int& y, const int& x) const;
