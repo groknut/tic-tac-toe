@@ -7,28 +7,35 @@ Player::Player(const char& sym, const std::string& n)
 Human::Human(const char& sym, const std::string& n) 
     : Player(sym, n) {}
 
+
 bool Human::makeMove(Board& board)
 {
 	int row, col;
+	bool validInput = false;
 
-	while (true)
+	while (!validInput)
 	{
-		std::cout << name << "(" << mark << "), input row and col (0-" << board.getSize() - 1 << "): ";
-
-		if (!(std::cin >> row >> col))
-		{
-			std::cin.clear();
-			std::cout << "Error: input 2 numbers" << std::endl;
-			continue;
-		}
-		if (board.isCellEmpty(row, col))
-		{
-			board.setCell(row, col, mark);
-			return true;
-		}
-		else
-			std::cout << "Cell isn't empty!" << std::endl;
-	}
+		std::cout << name << " (" << mark << "), input row and col (0-" << board.getSize() - 1 << "): ";
+		        
+        if (std::cin >> row >> col)
+        {
+            if (board.isCellEmpty(row, col))
+            {
+                board.setCell(row, col, mark);
+                return true;
+            }
+            else
+            {
+                std::cout << "Cell isn't empty or out of bounds! Try again.\n";
+            }
+        }
+        {
+            std::cin.clear();
+            std::cin.ignore(1000, '\n'); 
+            std::cout << "Error: Please input two numbers!\n";
+        }
+    }
+    return false;
 }
 
 AI::AI(const char& c, const std::string& n)
