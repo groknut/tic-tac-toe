@@ -1,11 +1,14 @@
-
-
 #include <iostream>
-
-using namespace std;
-
-int main(int argc. char** argv[])
+#include "board.h"
+#include "cfig.h"
+int main()
 {
-	cout << "hello";
-	return 0;
+
+	Cfig config(Cfig::EQUAL);
+	config.load("config.ini");
+	
+	Board board(config.get<int>("board", "size", 3),config.get<char>("board", "empty", ' '));
+	board.print();
+	
+    return 0;
 }
