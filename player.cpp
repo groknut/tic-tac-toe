@@ -1,4 +1,3 @@
-
 #include "player.h"
 
 Player::Player(const char& sym, const std::string& n) 
