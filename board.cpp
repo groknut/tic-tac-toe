@@ -67,14 +67,14 @@ int Board::getSize() const
 
 void Board::setCell(const int& y, const int& x, const char& mark)
 {
-	if (y < 0 || y >= board_size || x < 0 || x >= board_size)
+	if (y < 0 || y > board_size || x < 0 || x > board_size)
 		throw GridError();
 	grid[y][x] = mark;
 }
 
 const char& Board::getCell(const int& y, const int& x) const
 {
-	if (y < 0 || y >= board_size || x < 0 || x >= board_size)
+	if (y < 0 || y > board_size || x < 0 || x > board_size)
 		throw GridError();
 	return grid[y][x];
 }

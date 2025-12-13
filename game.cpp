@@ -11,9 +11,7 @@ Game::Game(const Cfig& config)
 		player1 = new Human(config.get<char>("player1", "mark", 'X'), config.get<std::string>("player1", "name", "Player"));
 		player2 = new AI(
 			config.get<char>("player2", "mark", 'O'), 
-			config.get<std::string>("player2", "name", "AI"),
-			config.get<int>("AI", "depth", 6),
-			config.get<int>("AI", "time_limit", 2000)
+			config.get<std::string>("player2", "name", "AI")
 		);
 	}
 	else
@@ -22,8 +20,8 @@ Game::Game(const Cfig& config)
 		player2 = new Human(config.get<char>("player2", "mark", 'O'), config.get<std::string>("player2", "name", "Player2"));
 	}
 
-	player1->setOpponentMark(player2->getMark());
-	player2->setOpponentMark(player1->getMark());
+	// player1->setOpponentMark(player2->getMark());
+	// player2->setOpponentMark(player1->getMark());
 
 	currentPlayer = player1;
     gameOver = false;

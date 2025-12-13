@@ -17,5 +17,7 @@ int main()
 		game.handleInput();
  	} while (!game.isOver());
 
+ 	// game.printBoard();
+
     return 0;
 }

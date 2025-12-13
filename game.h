@@ -4,7 +4,6 @@
 #include "board.h"
 #include "player.h"
 #include "cfig.h"
-#include "conio.h"
 
 class Game
 {
