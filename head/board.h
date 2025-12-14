@@ -27,6 +27,10 @@ public:
 	const char& getCell(const int& y, const int& x) const;
     const std::vector<std::vector<char>>& getGrid() const;
 
+	bool checkWin(const char& mark, const int& win_length) const;
+	
+    std::vector<std::pair<int, int>> getEmptyCells() const;
+    bool undoMove(int row, int col);
 };
 
 class GridError {};

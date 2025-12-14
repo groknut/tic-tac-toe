@@ -4,7 +4,8 @@
 #include "board.h"
 #include <string>
 #include <iostream>
-
+#include "minimax.h"
+#include "cfig.h"
 class Player
 {
 protected:
@@ -23,14 +24,16 @@ public:
 class Human : public Player
 {
 public:
-	Human(const char& c, const std::string& n = "Player");
+	Human(const char& c, const std::string& n);
 	bool makeMove(Board& board) override;
 };
 
 class AI : public Player
 {
+private:
+	MinimaxAI aiEngine;
 public:
-	AI(const char& c, const std::string& n = "AI");
+	AI(const char& c, const std::string& n, const Cfig& cfig);
 	bool makeMove(Board& board) override;
 };
 

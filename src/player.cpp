@@ -37,18 +37,30 @@ bool Human::makeMove(Board& board)
     return false;
 }
 
-AI::AI(const char& c, const std::string& n)
-	: Player(c, n) {}
+AI::AI(const char& c, const std::string& n, const Cfig& cfig)
+	: Player(c, n), aiEngine(cfig) {}
 
-bool AI::makeMove(Board& board)
-{
-	for (int i = 0; i < board.getSize(); i++)
-		for (int j = 0; j < board.getSize(); j++)
-			if (board.isCellEmpty(i, j))
-			{
-				std::cout << name << "(" << mark << "), moves to (" << i << ", " << j << ")" << std::endl;
-				board.setCell(i, j, mark);
-				return true;
-			}
-	return false;
+bool AI::makeMove(Board& board) {
+        
+    auto bestMove = aiEngine.findBestMove(board);
+    
+    if (bestMove.first != -1 && bestMove.second != -1) {
+        std::cout << name << " (" << mark << ") moves to (" 
+                  << bestMove.first << ", " << bestMove.second << ")\n";
+        board.setCell(bestMove.first, bestMove.second, mark);
+        return true;
+    }
+    
+    // Fallback
+    for (int i = 0; i < board.getSize(); i++) {
+        for (int j = 0; j < board.getSize(); j++) {
+            if (board.isCellEmpty(i, j)) {
+                std::cout << name << " (" << mark << "), moves to (" << i << ", " << j << ")" << std::endl;
+                board.setCell(i, j, mark);
+                return true;
+            }
+        }
+    }
+    
+    return false;
 }

@@ -11,7 +11,8 @@ Game::Game(const Cfig& config)
 		player1 = new Human(config.get<char>("player1", "mark", 'X'), config.get<std::string>("player1", "name", "Player"));
 		player2 = new AI(
 			config.get<char>("player2", "mark", 'O'), 
-			config.get<std::string>("player2", "name", "AI")
+			config.get<std::string>("player2", "name", "AI"),
+			config
 		);
 	}
 	else
@@ -23,7 +24,11 @@ Game::Game(const Cfig& config)
 	// player1->setOpponentMark(player2->getMark());
 	// player2->setOpponentMark(player1->getMark());
 
-	currentPlayer = player1;
+	if (config.get("game", "start").toChar() == player1->getMark())
+		currentPlayer = player1;
+	else
+		currentPlayer = player2;
+
     gameOver = false;
 }
 
@@ -61,46 +66,7 @@ char Game::getWinner() const
 
 bool Game::checkWin(const char& mark) const
 {
-	int size = board.getSize();
-
-	const int dirs[4][2] = {
-		{0, 1}, {1, 0}, {1, 1}, {1, -1}
-	};
-
-	for (int row = 0; row < size; row++)
-	{
-		for (int col = 0; col < size; col++)
-		{
-			if (board.getCell(row, col) != mark)
-				continue;
-
-			for (int d = 0; d < 4; d++)
-			{
-				int dr = dirs[d][0], dc = dirs[d][1];
-
-				int end_row = row + dr * (win_length - 1);
-				int end_col = col + dc * (win_length - 1);
-
-				if (end_row < 0 || end_row >= size || end_col < 0 || end_col >= size)
-					continue;
-
-				bool win = true;
-
-				for (int k = 0; k < win_length; k++)
-				{
-					if (board.getCell(row + dr * k, col + dc * k) != mark)
-					{
-						win = false;
-						break;
-					}				
-				}
-				if (win) 
-					return true;
-				
-			}
-		}
-	}
-	return false;
+	return board.checkWin(mark, win_length);
 }
 
 bool Game::checkWin() const
@@ -113,6 +79,7 @@ void Game::printResult()
     char winner = getWinner();
     if (winner != ' ')
     {
+    	printBoard();
         std::string winnerName = (winner == player1->getMark()) ? player1->getName() : player2->getName();
         std::cout << "Congratulations " << winnerName << "!\n";
     }
