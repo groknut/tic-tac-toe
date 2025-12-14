@@ -122,8 +122,7 @@ int MinimaxAI::evaluateLines(const Board& board)
 	                        char before = board.getCell(row - dr, col - dc);
 	                        if (before == board.getEmpty()) 
 	                        	openEnds++;
-	                    	else
-		                        openEnds++;
+
 	                    }
 	                    
 	                    if (row + dr * win_length < size && 
