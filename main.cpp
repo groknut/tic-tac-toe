@@ -13,6 +13,6 @@ int main()
 		game.printBoard();
 		game.handleInput();
  	} while (!game.isOver());
-
+ 	
     return 0;
 }
