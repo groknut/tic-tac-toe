@@ -1,23 +1,18 @@
 #include <iostream>
-#include "game.h"
+#include "./head/game.h"
 #include "cfig.h"
 int main()
 {
 
-	Cfig config(Cfig::EQUAL);
-	config.load("config.ini");
+	Cfig config("config.ini", Cfig::EQUAL, Cfig::HASH);
 
 	Game game(config);
-
     std::cout << "\n=== Tic-Tac-Toe ===\n";
-
     do
 	{
 		game.printBoard();
 		game.handleInput();
  	} while (!game.isOver());
-
- 	// game.printBoard();
 
     return 0;
 }
