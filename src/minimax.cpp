@@ -427,13 +427,15 @@ int MinimaxAI::minimax(Board& board, int depth, int alpha, int beta, bool maximi
         return score;
     }
     
-    
     orderMoves(board, moves);
     
     if (maximizing)
-        return Maximizing(board, depth, alpha, beta, moves);
+        bestScore = Maximizing(board, depth, alpha, beta, moves);
     else
-    	return Minimizing(board, depth, alpha, beta, moves);        
+    	bestScore = Minimizing(board, depth, alpha, beta, moves);        
+
+    tt[boardKey] = bestScore;
+    return bestScore;
 }
 
 std::pair<int, int> MinimaxAI::findBestMove(const Board& board) 
