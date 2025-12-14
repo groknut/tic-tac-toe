@@ -1,5 +1,5 @@
 
-#include "board.h"
+#include "../head/board.h"
 
 Board::Board(const int& bsize) : board_size(bsize)
 {

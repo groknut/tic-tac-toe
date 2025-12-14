@@ -1,4 +1,4 @@
-#include "player.h"
+#include "../head/player.h"
 
 Player::Player(const char& sym, const std::string& n) 
     : mark(sym), name(n) {}

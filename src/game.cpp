@@ -1,5 +1,5 @@
 
-#include "game.h"
+#include "../head/game.h"
 
 Game::Game(const Cfig& config)
 {
