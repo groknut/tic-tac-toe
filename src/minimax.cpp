@@ -407,6 +407,9 @@ int MinimaxAI::Minimizing(
 
 int MinimaxAI::minimax(Board& board, int depth, int alpha, int beta, bool maximizing) 
 {
+
+    int bestScore = 0;
+
     if (timeUp()) 
     	return 0;
     
