@@ -120,20 +120,18 @@ int MinimaxAI::evaluateLines(const Board& board)
 	                    if (row - dr >= 0 && col - dc >= 0 && col - dc < size) 
 	                    {
 	                        char before = board.getCell(row - dr, col - dc);
-	                     //    if (before == ' ') 
-	                     //    	openEnds++;
-	                    	// else
-		                    //     openEnds++;
+	                        if (before == board.getEmpty()) 
+	                        	openEnds++;
+	                    	else
+		                        openEnds++;
 	                    }
 	                    
 	                    if (row + dr * win_length < size && 
 	                        col + dc * win_length >= 0 && 
 	                        col + dc * win_length < size) {
 	                        char after = board.getCell(row + dr * win_length, col + dc * win_length);
-	      //                   if (after == ' ') 
-	      //                   	openEnds++;
-							// else
-	      //                   	openEnds++;
+	                        if (after == board.getEmpty()) 
+	                        	openEnds++;
 	                    }
 	                    score += evaluateWindow(pc, oc, openEnds);
                 }
@@ -141,6 +139,16 @@ int MinimaxAI::evaluateLines(const Board& board)
         }
     }
     return score;
+}
+
+bool MinimaxAI::undoMove(Board& board, const int& row, const int& col)
+{
+    if (row < 0 || row >= board.getSize() || col < 0 || col >= board.getSize() )
+        return false;
+    if (board.getCell(row, col) == board.getEmpty())
+        return false;
+    board.setCell(row, col, board.getEmpty());
+    return true;
 }
 
 int MinimaxAI::evaluateCenter(const Board& board)
@@ -256,7 +264,7 @@ bool MinimaxAI::findKillMove(Board& board, const char& mark, std::pair<int, int>
         board.setCell(cell.first, cell.second, mark);
         
         bool isWinning = board.checkWin(mark, win_length);
-        board.undoMove(cell.first, cell.second);
+        undoMove(board, cell.first, cell.second);
         
         if (isWinning)
         {
@@ -353,7 +361,7 @@ int MinimaxAI::Maximizing(
 	    
 	    int score = minimax(board, depth - 1, alpha, beta, false);
 	    
-	    board.undoMove(move.first, move.second);
+	    undoMove(board, move.first, move.second);
 	    
 	    if (timeUp()) 
 	    	return bestScore;
@@ -381,7 +389,7 @@ int MinimaxAI::Minimizing(
         int score = minimax(board, depth - 1, alpha, beta, true);
         
         // Отменяем ход
-        board.undoMove(move.first, move.second);
+        undoMove(board, move.first, move.second);
         
         // Проверка времени
         if (timeUp()) return bestScore;
@@ -406,10 +414,19 @@ int MinimaxAI::minimax(Board& board, int depth, int alpha, int beta, bool maximi
         return heuristicEval(board);
     }
     
-    auto moves = generateCandidateMoves(board);
+    std::string boardKey = serializeBoard(board);
+    auto it = tt.find(boardKey);
+    if (it != tt.end()) {
+        return it->second;
+    }
     
-    if (moves.empty()) 
-    	return heuristicEval(board);
+    auto moves = generateCandidateMoves(board);
+    if (moves.empty()) {
+        int score = heuristicEval(board);
+        tt[boardKey] = score;
+        return score;
+    }
+    
     
     orderMoves(board, moves);
     
@@ -457,7 +474,7 @@ std::pair<int, int> MinimaxAI::findBestMove(const Board& board)
             	boardCopy, currentDepth - 1, EngineConst::NEG_INF, EngineConst::INF, false
             );
             
-            boardCopy.undoMove(move.first, move.second);
+            undoMove(boardCopy, move.first, move.second);
             
             if (score > currentBestScore) 
             {

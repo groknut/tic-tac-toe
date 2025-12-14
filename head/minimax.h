@@ -33,6 +33,8 @@ private:
 
 	std::unordered_map<std::string, int> tt;
 
+    bool undoMove(Board& board, const int& row, const int& col);
+
 	int evaluateWindow(const int& pc, const int& oc, const int& openEnds);
 	int evaluateWindowPlayer(const int& oc, const int& openEnds);
 	int evaluateWindowAI(const int& pc, const int& openEnds);

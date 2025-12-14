@@ -1,16 +1,6 @@
 
 #include "../head/board.h"
 
-bool Board::undoMove(int row, int col) // ДОБАВЛЕНО
-{
-    if (row < 0 || row >= board_size || col < 0 || col >= board_size)
-        return false;
-    if (grid[row][col] == empty)
-        return false;
-    grid[row][col] = empty;
-    return true;
-}
-
 Board::Board(const int& bsize) : board_size(bsize)
 {
 	grid.resize(board_size);
