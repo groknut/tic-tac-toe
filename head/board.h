@@ -5,6 +5,14 @@
 #include <iostream>
 #include <iomanip>
 #include <vector>
+#include <string>
+
+namespace colors
+{
+	const std::string red = "\u001b[91m";
+	const std::string green = "\u001b[92m";
+	const std::string reset = "\u001b[0m";
+}
 
 class Board
 {
@@ -18,6 +26,7 @@ public:
 	Board(const int& bsize);
 	Board(const int& bsize, const char& empty_symbol);
 	void print() const;
+	void print(const char& player1, const char& player2) const;
 	bool isCellEmpty(const int& row,const int& col) const;
 
 	bool isFull() const;

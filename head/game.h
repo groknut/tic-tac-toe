@@ -14,6 +14,7 @@ private:
 	Player* currentPlayer;
 	int win_length;
 	bool gameOver;
+	bool color = false;
 
 	bool checkWin(const char& mark) const;
 	bool checkWin() const;

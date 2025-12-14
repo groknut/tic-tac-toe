@@ -21,8 +21,7 @@ Game::Game(const Cfig& config)
 		player2 = new Human(config.get<char>("player2", "mark", 'O'), config.get<std::string>("player2", "name", "Player2"));
 	}
 
-	// player1->setOpponentMark(player2->getMark());
-	// player2->setOpponentMark(player1->getMark());
+	color = config.get<bool>("game", "color", false);
 
 	if (config.get("game", "start").toChar() == player1->getMark())
 		currentPlayer = player1;
@@ -41,7 +40,10 @@ Game::~Game()
 void Game::printBoard()
 {
 	system("cls");
-    board.print();
+	if (color)
+		board.print(player1->getMark(), player2->getMark());
+    else
+    	board.print();
 }
 
 bool Game::isOver()

@@ -25,29 +25,61 @@ Board::Board(const int& bsize, const char& empty_symbol) : board_size(bsize), em
         row.resize(board_size, empty);
 }
 
+void Board::print(const char& player1, const char& player2) const
+{
+
+	int size = grid.size();
+	    
+    std::cout << std::endl << "   ";
+    for (int i = 0; i < size; i++) {
+        std::cout << std::setw(2) << i << " ";
+    }
+    std::cout << std::endl << "   ";
+    for (int i = 0; i < size * 3; i++) {
+        std::cout << "_";
+    }
+    std::cout << std::endl;
+    
+    for (int i = 0; i < size; i++) {
+        std::cout << std::setw(2) << i << "| ";
+        for (int j = 0; j < size; j++)
+        {
+        	if (grid[i][j] == player1)
+        		std::cout << colors::green << grid[i][j];
+        	else if (grid[i][j] == player2)
+        		std::cout << colors::red << grid[i][j];
+        	else
+        		std::cout << grid[i][j];
+
+        	std::cout << colors::reset << "  ";
+        }
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
+}
+
 void Board::print() const
 {
 
 	int size = grid.size();
 	    
-	    std::cout << std::endl << "   ";
-	    for (int i = 0; i < size; i++) {
-	        std::cout << std::setw(2) << i << " ";
-	    }
-	    std::cout << std::endl << "   ";
-	    for (int i = 0; i < size * 3; i++) {
-	        std::cout << "_";
-	    }
-	    std::cout << std::endl;
-	    
-	    for (int i = 0; i < size; i++) {
-	        std::cout << std::setw(2) << i << "| ";
-	        for (int j = 0; j < size; j++) {
-	            std::cout << grid[i][j] << "  ";
-	        }
-	        std::cout << std::endl;
-	    }
-	    std::cout << std::endl;
+    std::cout << std::endl << "   ";
+    for (int i = 0; i < size; i++) {
+        std::cout << std::setw(2) << i << " ";
+    }
+    std::cout << std::endl << "   ";
+    for (int i = 0; i < size * 3; i++) {
+        std::cout << "_";
+    }
+    std::cout << std::endl;
+    
+    for (int i = 0; i < size; i++) {
+        std::cout << std::setw(2) << i << "| ";
+        for (int j = 0; j < size; j++)
+        	std::cout << grid[i][j] << "  ";        	
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
 }
 
 const std::vector<std::vector<char>>& Board::getGrid() const 
