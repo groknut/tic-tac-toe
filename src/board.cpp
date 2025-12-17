@@ -112,6 +112,8 @@ const char& Board::getCell(const int& y, const int& x) const
 }
 
 
+
+
 std::vector<std::pair<int, int>> Board::getEmptyCells() const
 {
 	std::vector<std::pair<int, int>> cells;
@@ -124,10 +126,13 @@ std::vector<std::pair<int, int>> Board::getEmptyCells() const
 
 bool Board::checkWin(const char& mark, const int& win_length) const
 {
-	const int dirs[4][2] = {
-		{0, 1}, {1, 0}, {1, 1}, {1, -1}
-	};
-	    
+    const int dirs[4][2] = {
+        {0, 1},   // вправо
+        {1, 0},   // вниз
+        {1, 1},   // вниз-вправо
+        {1, -1}  // вниз-влево
+    };
+    
     for (int row = 0; row < board_size; row++) 
     {
         for (int col = 0; col < board_size; col++) 
@@ -148,9 +153,104 @@ bool Board::checkWin(const char& mark, const int& win_length) const
                     }
                 }
                 if (win) 
-                	return true;
+                    return true;
             }
         }
     }
     return false;
 }
+
+// bool Board::checkWin(const char& mark, const int& win_length) const
+// {
+//     // Проверка по горизонтали
+//     for (int row = 0; row < board_size; row++) {
+//         for (int col = 0; col <= board_size - win_length; col++) {
+//             bool win = true;
+//             for (int k = 0; k < win_length; k++) {
+//                 if (grid[row][col + k] != mark) {
+//                     win = false;
+//                     break;
+//                 }
+//             }
+//             if (win) return true;
+//         }
+//     }
+    
+//     // Проверка по вертикали
+//     for (int col = 0; col < board_size; col++) {
+//         for (int row = 0; row <= board_size - win_length; row++) {
+//             bool win = true;
+//             for (int k = 0; k < win_length; k++) {
+//                 if (grid[row + k][col] != mark) {
+//                     win = false;
+//                     break;
+//                 }
+//             }
+//             if (win) return true;
+//         }
+//     }
+    
+//     // Проверка по диагонали (сверху-слева вниз-вправо)
+//     for (int row = 0; row <= board_size - win_length; row++) {
+//         for (int col = 0; col <= board_size - win_length; col++) {
+//             bool win = true;
+//             for (int k = 0; k < win_length; k++) {
+//                 if (grid[row + k][col + k] != mark) {
+//                     win = false;
+//                     break;
+//                 }
+//             }
+//             if (win) return true;
+//         }
+//     }
+    
+//     // Проверка по диагонали (сверху-справа вниз-влево)
+//     for (int row = 0; row <= board_size - win_length; row++) {
+//         for (int col = win_length - 1; col < board_size; col++) {
+//             bool win = true;
+//             for (int k = 0; k < win_length; k++) {
+//                 if (grid[row + k][col - k] != mark) {
+//                     win = false;
+//                     break;
+//                 }
+//             }
+//             if (win) return true;
+//         }
+//     }
+    
+//     return false;
+// }
+
+// bool Board::checkWin(const char& mark, const int& win_length) const
+// {
+// 	const int dirs[4][2] = {
+// 		{0, 1}, {1, 0}, {1, 1}, {1, -1}
+// 	};
+	    
+//     for (int row = 0; row < board_size; row++) 
+//     {
+//         for (int col = 0; col < board_size; col++) 
+//         {
+//             if (grid[row][col] != mark) continue;
+            
+//             for (int d = 0; d < 4; d++) {
+//                 int dr = dirs[d][0], dc = dirs[d][1];
+                
+//                 bool win = true;
+//                 for (int k = 0; k < win_length; k++) {
+//                     int r = row + dr * k;
+//                     int c = col + dc * k;
+//                     if (r < 0 || r >= board_size || c < 0 || c >= board_size || grid[r][c] != mark) 
+//                     {
+//                         win = false;
+//                         break;
+//                     }
+//                 }
+//                 if (win) 
+//                 	return true;
+//             }
+//         }
+//     }
+//     return false;
+// }
+
