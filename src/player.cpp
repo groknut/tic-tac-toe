@@ -38,22 +38,32 @@ bool Human::makeMove(Board& board)
 }
 
 AI::AI(const char& c, const std::string& n, const Cfig& cfig)
-	: Player(c, n), aiEngine(cfig) {}
+	: Player(c, n), aiEngine(cfig) 
+{
+    if (cfig.has("debug"))
+        sleep_time = cfig.get<int>("debug", "sleep", 0);
+}
 
 bool AI::makeMove(Board& board) {
         
     auto bestMove = aiEngine.findBestMove(board);
     
-    if (bestMove.first != -1 && bestMove.second != -1) {
+    if (bestMove.first != -1 && bestMove.second != -1) 
+    {
         std::cout << name << " (" << mark << ") moves to (" 
                   << bestMove.first << ", " << bestMove.second << ")\n";
+        sleep(sleep_time);
+            
         board.setCell(bestMove.first, bestMove.second, mark);
+        std::cout << "AI move to " << "(" << bestMove.first << ", " << bestMove.second << std::endl;
         return true;
     }
     
     // Fallback
-    for (int i = 0; i < board.getSize(); i++) {
-        for (int j = 0; j < board.getSize(); j++) {
+    for (int i = 0; i < board.getSize(); i++) 
+    {
+        for (int j = 0; j < board.getSize(); j++) 
+        {
             if (board.isCellEmpty(i, j)) {
                 std::cout << name << " (" << mark << "), moves to (" << i << ", " << j << ")" << std::endl;
                 board.setCell(i, j, mark);
@@ -63,4 +73,13 @@ bool AI::makeMove(Board& board) {
     }
     
     return false;
+}
+
+
+void AI::sleep(int milliseconds) {
+    clock_t start_time = clock();
+    
+    clock_t wait_time = milliseconds * CLOCKS_PER_SEC / 1000;
+    
+    while (clock() < start_time + wait_time) {}
 }

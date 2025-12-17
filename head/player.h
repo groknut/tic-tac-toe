@@ -32,6 +32,8 @@ class AI : public Player
 {
 private:
 	MinimaxAI aiEngine;
+    int sleep_time;
+    void sleep(int milliseconds);
 public:
 	AI(const char& c, const std::string& n, const Cfig& cfig);
 	bool makeMove(Board& board) override;
