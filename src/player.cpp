@@ -57,21 +57,7 @@ bool AI::makeMove(Board& board) {
         board.setCell(bestMove.first, bestMove.second, mark);
         std::cout << "AI move to " << "(" << bestMove.first << ", " << bestMove.second << std::endl;
         return true;
-    }
-    
-    // Fallback
-    for (int i = 0; i < board.getSize(); i++) 
-    {
-        for (int j = 0; j < board.getSize(); j++) 
-        {
-            if (board.isCellEmpty(i, j)) {
-                std::cout << name << " (" << mark << "), moves to (" << i << ", " << j << ")" << std::endl;
-                board.setCell(i, j, mark);
-                return true;
-            }
-        }
-    }
-    
+    }    
     return false;
 }
 
