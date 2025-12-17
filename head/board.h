@@ -17,7 +17,8 @@ namespace colors
 class Board
 {
 private:
-	std::vector<std::vector<char>> grid;
+    std::vector<char> grid;
+    int index(int row, int col) const { return board_size * row + col; }
 	char empty = ' ';
 	int board_size = 3;
 
@@ -34,10 +35,8 @@ public:
     int getSize() const;
     void setCell(const int& y, const int& x, const char& mark);
 	const char& getCell(const int& y, const int& x) const;
-    const std::vector<std::vector<char>>& getGrid() const;
-
+    const std::vector<char>& getGrid() const { return grid; }
 	bool checkWin(const char& mark, const int& win_length) const;
-	
     std::vector<std::pair<int, int>> getEmptyCells() const;
 };
 
