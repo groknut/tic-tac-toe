@@ -23,6 +23,9 @@ Game::Game(const Cfig& config)
 
 	color = config.get<bool>("game", "color", false);
 
+    if (config.has("debug"))
+        clear_console = config.get<bool>("debug", "clear_console", false);
+
 	if (config.get("game", "start").toChar() == player1->getMark())
 		currentPlayer = player1;
 	else
@@ -39,7 +42,8 @@ Game::~Game()
 
 void Game::printBoard()
 {
-	system("cls");
+    if (clear_console)
+    	system("cls");
 	if (color)
 		board.print(player1->getMark(), player2->getMark());
     else
@@ -68,7 +72,7 @@ char Game::getWinner() const
 
 bool Game::checkWin(const char& mark) const
 {
-	return board.checkWin(mark, win_length);
+    return board.checkWin(mark, win_length);
 }
 
 bool Game::checkWin() const
@@ -91,7 +95,7 @@ void Game::printResult()
 
 void Game::handleInput()
 {
-    
+   
     std::cout << currentPlayer->getName() << "'s turn (" << currentPlayer->getMark() << "):\n";
     
     bool moveMade = currentPlayer->makeMove(board);
@@ -111,7 +115,7 @@ void Game::handleInput()
 			printResult();
 		}
 		else
-			switchPlayer();
+            switchPlayer();
 	}
     
     else
