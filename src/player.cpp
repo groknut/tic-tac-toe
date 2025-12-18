@@ -59,9 +59,7 @@ bool AI::makeMove(Board& board) {
                              std::to_string(bestMove.first) + ", " + 
                              std::to_string(bestMove.second) + ")";
         lastThinkingLog.push_back(moveMsg);    
-        board.setCell(bestMove.first, bestMove.second, mark);
-        // std::cout << "AI move to " << "(" << bestMove.first << ", " << bestMove.second << std::endl;
-        
+        board.setCell(bestMove.first, bestMove.second, mark);        
         return true;
     }    
     return false;

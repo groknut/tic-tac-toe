@@ -1,7 +1,6 @@
 #include "../head/minimax.h"
 
-
-MinimaxAI::MinimaxAI(const Cfig& cfig) 
+MinimaxAI::MinimaxAI(const Cfig& cfig)
 {   
     aiMark = cfig("player2", "mark").toChar();     
     playerMark = cfig("player1", "mark").toChar(); 
@@ -60,7 +59,6 @@ std::vector<std::pair<int, int>> MinimaxAI::getOrderedMoves(const Board& board, 
 {    
     std::vector<std::pair<int, int>> moves;   
     std::vector<bool> considered(size * size, false);
-    // std::vector<std::vector<bool>> considered(size, std::vector<bool>(size, false));
 
     for (int i = 0; i < size; i++) 
     {
@@ -137,7 +135,7 @@ int MinimaxAI::evaluateLine(const Board& board, int startRow, int startCol,
         int baseScore = EngineConst::LINE_SCORES[aiCount];
 
         if (emptyCount > 0)
-            return baseScore * (emptyCount + 1);
+            return baseScore + (emptyCount * 2);
         return baseScore;
     }
     
@@ -146,7 +144,7 @@ int MinimaxAI::evaluateLine(const Board& board, int startRow, int startCol,
         int baseScore = EngineConst::LINE_SCORES[playerCount];
         
         if (emptyCount > 0)
-            return -baseScore * (emptyCount + 2);
+            return -baseScore + (emptyCount * 2);
         return -baseScore;
     }
     
@@ -206,22 +204,20 @@ int MinimaxAI::evaluate(const Board& board) const {
         return EngineConst::WIN_SCORE;
     else if (board.checkWin(playerMark, win_length))
         return EngineConst::LOSS_SCORE;
-    
    
     return evaluatePosition(board);
 }
 
 
 int MinimaxAI::minimax(Board& board, int depth, int alpha, int beta,
-                      bool maximizingPlayer) {
+                      bool maximizingPlayer) 
+{
     
     if (timeUp()) 
         return 0;
     
-    if (depth == 0 || isTerminal(board)) {
-       
+    if (depth == 0 || isTerminal(board))
         return evaluate(board);
-    }
     
    
     auto moves = getOrderedMoves(board, maximizingPlayer);
@@ -248,14 +244,8 @@ int MinimaxAI::minimax(Board& board, int depth, int alpha, int beta,
             
            
             alpha = std::max(alpha, eval);
-            if (beta <= alpha) {
-               
-               
-               
-               
-               
+            if (beta <= alpha)
                 break;
-            }
         }
         
         return maxEval;
@@ -273,13 +263,8 @@ int MinimaxAI::minimax(Board& board, int depth, int alpha, int beta,
             minEval = std::min(minEval, eval);
             beta = std::min(beta, eval);
             
-            if (beta <= alpha) {
-               
-               
-               
-               
+            if (beta <= alpha)
                 break;
-            }
         }
         
         return minEval;
@@ -291,8 +276,6 @@ std::pair<int, int> MinimaxAI::iterativeDeepening(Board& board) {
     std::pair<int, int> bestMove = {-1, -1};
     int bestScore = EngineConst::NEG_INF;
 
-    // thinkingLog.clear();    
-   
     for (int depth = 1; depth <= max_depth; depth++) {
         if (timeUp()) break;
         
@@ -321,10 +304,8 @@ std::pair<int, int> MinimaxAI::iterativeDeepening(Board& board) {
             if (score > currentBest) {
                 currentBest = score;
                 currentBestMove = move;
-                
-               
-                alpha = std::max(alpha, currentBest);
             }
+            alpha = std::max(alpha, currentBest);
         }
         
        
@@ -338,7 +319,7 @@ std::pair<int, int> MinimaxAI::iterativeDeepening(Board& board) {
                 std::string msg = "[AI] Depth " + std::to_string(depth) + 
                                  ": Move (" + std::to_string(bestMove.first) + 
                                  "," + std::to_string(bestMove.second) + 
-                                 ") Score " + std::to_string(bestScore);
+                                 ") Score " + std::to_string(currentBest);
                 thinkingLog.push_back(msg);
             }
             
