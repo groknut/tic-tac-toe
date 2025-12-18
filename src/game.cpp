@@ -42,12 +42,26 @@ Game::~Game()
 
 void Game::printBoard()
 {
+    // AI* aiPlayer = dynamic_cast<AI*>(currentPlayer);
     if (clear_console)
     	system("cls");
 	if (color)
 		board.print(player1->getMark(), player2->getMark());
     else
     	board.print();
+
+    if (currentPlayer != nullptr) {
+        // Определяем, кто был предыдущим игроком
+        Player* previousPlayer = (currentPlayer == player1) ? player2 : player1;
+        
+        AI* previousAI = dynamic_cast<AI*>(previousPlayer);
+        if (previousAI) {
+            // Показываем лог размышлений AI
+            previousAI->printThinkingLog();
+            // Очищаем лог после показа
+            previousAI->clearLastLog();
+        }
+    }
 }
 
 bool Game::isOver()
@@ -115,7 +129,13 @@ void Game::handleInput()
 			printResult();
 		}
 		else
+        {
             switchPlayer();
+            // AI* aiPlayer = dynamic_cast<AI*>(currentPlayer);
+            // if (aiPlayer) {
+            //     aiPlayer->clearLastLog();
+            // }
+        }
 	}
     
     else
