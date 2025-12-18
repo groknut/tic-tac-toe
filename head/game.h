@@ -26,13 +26,10 @@ private:
 public:
 	Game(const Cfig& config);
 	~Game();
-
 	void printBoard();
 	void handleInput();
-	void save();
 	bool isOver();
-
-	
+    void run();
 };
 
 #endif

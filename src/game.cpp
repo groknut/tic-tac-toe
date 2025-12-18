@@ -6,7 +6,7 @@ Game::Game(const Cfig& config)
 	win_length = config.get<int>("game", "win_length", 3);
 	board = Board(config.get<int>("board", "size", 3),config.get<char>("board", "empty", ' '));
 
-	if (config.get("player2", "type").toString() == std::string("ai"))
+	if (config.get("player2", "type").toString() == std::string("ai") && config.get("player1", "type").toString() == std::string("human"))
 	{
 		player1 = new Human(config.get<char>("player1", "mark", 'X'), config.get<std::string>("player1", "name", "Player"));
 		player2 = new AI(
@@ -15,11 +15,24 @@ Game::Game(const Cfig& config)
 			config
 		);
 	}
-	else
+	else if (config.get("player1", "type").toString() == std::string("human") && config.get("player2", "type").toString() == std::string("human"))
 	{
 		player1 = new Human(config.get<char>("player1", "mark", 'X'), config.get<std::string>("player1", "name", "Player1"));
 		player2 = new Human(config.get<char>("player2", "mark", 'O'), config.get<std::string>("player2", "name", "Player2"));
 	}
+    else
+    {
+        player1 = new AI(
+			config.get<char>("player1", "mark", 'O'), 
+			config.get<std::string>("player1", "name", "AI"),
+			config
+		);
+        player2 = new AI(
+			config.get<char>("player2", "mark", 'O'), 
+			config.get<std::string>("player2", "name", "AI"),
+			config
+		);
+    }
 
 	color = config.get<bool>("game", "color", false);
 
@@ -42,7 +55,6 @@ Game::~Game()
 
 void Game::printBoard()
 {
-    // AI* aiPlayer = dynamic_cast<AI*>(currentPlayer);
     if (clear_console)
     	system("cls");
 	if (color)
@@ -50,15 +62,13 @@ void Game::printBoard()
     else
     	board.print();
 
-    if (currentPlayer != nullptr) {
-        // Определяем, кто был предыдущим игроком
+    if (currentPlayer != nullptr) 
+    {
         Player* previousPlayer = (currentPlayer == player1) ? player2 : player1;
         
         AI* previousAI = dynamic_cast<AI*>(previousPlayer);
         if (previousAI) {
-            // Показываем лог размышлений AI
             previousAI->printThinkingLog();
-            // Очищаем лог после показа
             previousAI->clearLastLog();
         }
     }
@@ -129,15 +139,19 @@ void Game::handleInput()
 			printResult();
 		}
 		else
-        {
             switchPlayer();
-            // AI* aiPlayer = dynamic_cast<AI*>(currentPlayer);
-            // if (aiPlayer) {
-            //     aiPlayer->clearLastLog();
-            // }
-        }
 	}
     
     else
         std::cout << "Invalid move, try again.\n";
+}
+
+
+void Game::run()
+{
+    do
+	{
+		printBoard();
+		handleInput();
+ 	} while (!isOver());
 }
