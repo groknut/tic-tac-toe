@@ -52,15 +52,32 @@ bool AI::makeMove(Board& board) {
     {
         std::cout << name << " (" << mark << ") moves to (" 
                   << bestMove.first << ", " << bestMove.second << ")\n";
+        lastThinkingLog = aiEngine.getThinkingLog();
         sleep(sleep_time);
-            
+        std::string moveMsg = name + " (" + std::string(1, mark) + 
+                             ") moves to (" + 
+                             std::to_string(bestMove.first) + ", " + 
+                             std::to_string(bestMove.second) + ")";
+        lastThinkingLog.push_back(moveMsg);    
         board.setCell(bestMove.first, bestMove.second, mark);
-        std::cout << "AI move to " << "(" << bestMove.first << ", " << bestMove.second << std::endl;
+        // std::cout << "AI move to " << "(" << bestMove.first << ", " << bestMove.second << std::endl;
+        
         return true;
     }    
     return false;
 }
 
+void AI::printThinkingLog()
+{
+    if (lastThinkingLog.empty()) return;
+    
+    std::cout << "\n--- AI Thinking Log ---" << std::endl;
+    for (const auto& log : lastThinkingLog)
+    {
+        std::cout << log << std::endl;
+    }
+    std::cout << "------------------------\n" << std::endl;
+}
 
 void AI::sleep(int milliseconds) {
     clock_t start_time = clock();
