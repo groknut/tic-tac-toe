@@ -39,6 +39,8 @@ private:
     clock_t startTime; // Время начала поиска
     bool showThinking; // Показывать процесс мышления
 
+    std::vector<std::string> thinkingLog;
+
     int size;          // размер доски
     char emptyCell;    // значение пустой клетки
         
@@ -84,6 +86,9 @@ public:
     
     // Основной метод для поиска лучшего хода
     std::pair<int, int> findBestMove(Board& board);
+
+    const std::vector<std::string>& getThinkingLog() const { return thinkingLog; }
+    void clearThinkingLog() { thinkingLog.clear(); }
 };
 
 #endif

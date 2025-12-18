@@ -18,7 +18,6 @@ bool MinimaxAI::timeUp() const
     return (clock() - startTime) * 1000.0 / CLOCKS_PER_SEC > time_limit;
 }
 
-
 bool MinimaxAI::isTerminal(const Board& board) const 
 {
     return board.checkWin(aiMark, win_length) ||
@@ -35,7 +34,6 @@ void MinimaxAI::undoMove(Board& board, int row, int col)
 {
     board.setCell(row, col, emptyCell);
 }
-
 
 int MinimaxAI::quickMoveScore(const Board& board, int row, int col, char mark, bool forAI) const 
 {
@@ -61,13 +59,13 @@ int MinimaxAI::quickMoveScore(const Board& board, int row, int col, char mark, b
 std::vector<std::pair<int, int>> MinimaxAI::getOrderedMoves(const Board& board, bool forAI) const 
 {    
     std::vector<std::pair<int, int>> moves;   
-    std::vector<std::vector<bool>> considered(size, std::vector<bool>(size, false));
+    std::vector<bool> considered(size * size, false);
+    // std::vector<std::vector<bool>> considered(size, std::vector<bool>(size, false));
 
     for (int i = 0; i < size; i++) 
     {
         for (int j = 0; j < size; j++) 
         {
-           
             if (board.getCell(i, j) != emptyCell) 
             {
                 for (int di = -1; di <= 1; di++) 
@@ -79,10 +77,10 @@ std::vector<std::pair<int, int>> MinimaxAI::getOrderedMoves(const Board& board, 
                         
                         if (ni >= 0 && ni < size && nj >= 0 && nj < size &&
                             board.getCell(ni, nj) == emptyCell &&
-                            !considered[ni][nj]) 
+                            !considered[ni * size + nj]) 
                         {
                             moves.emplace_back(ni, nj);
-                            considered[ni][nj] = true;
+                            considered[ni * size + nj] = true;
                         }
                     }
                 }
@@ -292,7 +290,8 @@ int MinimaxAI::minimax(Board& board, int depth, int alpha, int beta,
 std::pair<int, int> MinimaxAI::iterativeDeepening(Board& board) {
     std::pair<int, int> bestMove = {-1, -1};
     int bestScore = EngineConst::NEG_INF;
-    
+
+    // thinkingLog.clear();    
    
     for (int depth = 1; depth <= max_depth; depth++) {
         if (timeUp()) break;
@@ -334,16 +333,19 @@ std::pair<int, int> MinimaxAI::iterativeDeepening(Board& board) {
             bestScore = currentBest;
             
            
-            if (showThinking) {
-                std::cout << "[AI] Глубина " << depth << ": ход ("
-                         << bestMove.first << "," << bestMove.second
-                         << ") оценка " << bestScore << std::endl;
+            if (showThinking) 
+            {
+                std::string msg = "[AI] Depth " + std::to_string(depth) + 
+                                 ": Move (" + std::to_string(bestMove.first) + 
+                                 "," + std::to_string(bestMove.second) + 
+                                 ") Score " + std::to_string(bestScore);
+                thinkingLog.push_back(msg);
             }
             
            
             if (bestScore > EngineConst::WIN_SCORE / 2) {
                 if (showThinking) {
-                    std::cout << "[AI] Найден выигрышный ход, прекращаю поиск" << std::endl;
+                    thinkingLog.push_back("[AI] Find winning move, stop find");
                 }
                 break;
             }
@@ -353,65 +355,62 @@ std::pair<int, int> MinimaxAI::iterativeDeepening(Board& board) {
 }
 
 
-std::pair<int, int> MinimaxAI::findBestMove(Board& board) {
-   
+std::pair<int, int> MinimaxAI::findBestMove(Board& board) 
+{   
     startTime = clock();
-    
-   
-    
+    thinkingLog.clear();
    
     auto emptyCells = board.getEmptyCells();
-    for (const auto& cell : emptyCells) {
+    for (const auto& cell : emptyCells) 
+    {
         board.setCell(cell.first, cell.second, aiMark);
-        if (board.checkWin(aiMark, win_length)) {
+        if (board.checkWin(aiMark, win_length)) 
+        {
             board.setCell(cell.first, cell.second, emptyCell);
-            if (showThinking) {
-                std::cout << "[AI] Нашел выигрышный ход!" << std::endl;
-            }
+            if (showThinking)
+                thinkingLog.push_back("[AI] Find wininng move!");
             return cell;
         }
         board.setCell(cell.first, cell.second, emptyCell);
     }
     
-   
-    for (const auto& cell : emptyCells) {
+    for (const auto& cell : emptyCells) 
+    {
         board.setCell(cell.first, cell.second, playerMark);
-        if (board.checkWin(playerMark, win_length)) {
+        if (board.checkWin(playerMark, win_length)) 
+        {
             board.setCell(cell.first, cell.second, emptyCell);
-            if (showThinking) {
-                std::cout << "[AI] Блокирую выигрыш противника!" << std::endl;
-            }
+            if (showThinking)
+                thinkingLog.push_back("[AI] Block player win!");
             return cell;
         }
         board.setCell(cell.first, cell.second, emptyCell);
     }
-    
-   
     
     std::pair<int, int> bestMove = iterativeDeepening(board);
-    
    
-    
     if (bestMove.first == -1 && !emptyCells.empty()) {
        
         int bestScore = -1000000;
-        for (const auto& cell : emptyCells) {
+        for (const auto& cell : emptyCells) 
+        {
             int score = quickMoveScore(board, cell.first, cell.second, aiMark, true);
-            if (score > bestScore) {
+            if (score > bestScore) 
+            {
                 bestScore = score;
                 bestMove = cell;
             }
         }
         
-        if (showThinking) {
-            std::cout << "[AI] Использую fallback стратегию" << std::endl;
-        }
+        if (showThinking)
+            thinkingLog.push_back("[AI] Using fallback strategy");
     }
     
     return bestMove;
 }
 
-bool MinimaxAI::isWinningMove(const Board& board, int row, int col, char mark) const {
+bool MinimaxAI::isWinningMove(const Board& board, int row, int col, char mark) const 
+{
     Board tempBoard = board;
     tempBoard.setCell(row, col, mark);
     return tempBoard.checkWin(mark, win_length);
