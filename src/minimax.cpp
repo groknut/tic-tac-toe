@@ -1,27 +1,24 @@
 #include "../head/minimax.h"
+#include "../head/game.h"
 
-MinimaxAI::MinimaxAI(const Cfig& cfig)
+MinimaxAI::MinimaxAI(const Cfig& cfig, Game* gameptr) : game(gameptr)
 {   
     aiMark = cfig("player2", "mark").toChar();     
     playerMark = cfig("player1", "mark").toChar(); 
     max_depth = cfig("AI", "depth").toInt();       
     time_limit = cfig("AI", "time_limit").toInt(); 
     win_length = cfig("game", "win_length").toInt();
-    showThinking = cfig.get<bool>("AI", "show_thinking", false);
-    size = cfig("board", "size").toInt();
-    emptyCell = cfig("board", "empty").toChar();
+    showThinking = cfig.get<bool>("AI", "show_thinking", false);    
+}
+
+MinimaxAI::~MinimaxAI()
+{
+    delete game;
 }
 
 bool MinimaxAI::timeUp() const 
 {   
     return (clock() - startTime) * 1000.0 / CLOCKS_PER_SEC > time_limit;
-}
-
-bool MinimaxAI::isTerminal(const Board& board) const 
-{
-    return board.checkWin(aiMark, win_length) ||
-           board.checkWin(playerMark, win_length) ||
-           board.isFull();
 }
 
 void MinimaxAI::setMove(Board& board, int row, int col, char mark) 
@@ -31,12 +28,13 @@ void MinimaxAI::setMove(Board& board, int row, int col, char mark)
 
 void MinimaxAI::undoMove(Board& board, int row, int col) 
 {
-    board.setCell(row, col, emptyCell);
+    board.setCell(row, col, board.getEmpty());
 }
 
 int MinimaxAI::quickMoveScore(const Board& board, int row, int col, char mark, bool forAI) const 
 {
     int score = 0;
+    int size = board.getSize();
     int center = size / 2;
     int distance = abs(row - center) + abs(col - center);
     score += (size - distance) * 3;
@@ -54,15 +52,15 @@ int MinimaxAI::quickMoveScore(const Board& board, int row, int col, char mark, b
     return score;
 }
 
-
 std::vector<std::pair<int, int>> MinimaxAI::getOrderedMoves(const Board& board, bool forAI) const 
 {    
     std::vector<std::pair<int, int>> moves;   
+    int size = board.getSize();
     std::vector<bool> considered(size * size, false);
 
     for (int i = 0; i < size; i++) 
         for (int j = 0; j < size; j++) 
-            if (board.getCell(i, j) != emptyCell) 
+            if (board.getCell(i, j) != board.getEmpty()) 
                 for (int di = -1; di <= 1; di++) 
                     for (int dj = -1; dj <= 1; dj++) 
                     {
@@ -70,7 +68,7 @@ std::vector<std::pair<int, int>> MinimaxAI::getOrderedMoves(const Board& board, 
                         int nj = j + dj;
                         
                         if (ni >= 0 && ni < size && nj >= 0 && nj < size &&
-                            board.getCell(ni, nj) == emptyCell &&
+                            board.getCell(ni, nj) == board.getEmpty() &&
                             !considered[ni * size + nj]) 
                         {
                             moves.emplace_back(ni, nj);
@@ -98,107 +96,16 @@ std::vector<std::pair<int, int>> MinimaxAI::getOrderedMoves(const Board& board, 
     return moves;
 }
 
-
-int MinimaxAI::evaluateLine(const Board& board, int startRow, int startCol,
-                           int deltaRow, int deltaCol) const 
-{    
-    int aiCount = 0, playerCount = 0, emptyCount = 0;
-   
-    for (int i = 0; i < win_length; i++) 
-    {
-        int row = startRow + i * deltaRow;
-        int col = startCol + i * deltaCol;
-        char cell = board.getCell(row, col);
-        
-        if (cell == aiMark)
-            aiCount++;
-        else if (cell == playerMark)
-            playerCount++;
-        else if (cell == emptyCell)
-            emptyCount++;
-    }
-    
-    if (aiCount > 0 && playerCount > 0)
-        return 0;
-    
-    if (aiCount > 0 && playerCount == 0) {
-        int baseScore = EngineConst::LINE_SCORES[aiCount];
-
-        if (emptyCount > 0)
-            return baseScore + (emptyCount * 2);
-        return baseScore;
-    }
-    
-    if (playerCount > 0 && aiCount == 0) {
-        int baseScore = EngineConst::LINE_SCORES[playerCount];
-        
-        if (emptyCount > 0)
-            return -baseScore + (emptyCount * 2);
-        return -baseScore;
-    }
-    
-    return 0;
-}
-
-
-int MinimaxAI::evaluatePosition(const Board& board) const 
-{
-    int score = 0;
-   
-    for (int row = 0; row < size; row++)
-        for (int col = 0; col <= size - win_length; col++)
-            score += evaluateLine(board, row, col, 0, 1);
-    
-    for (int col = 0; col < size; col++)
-        for (int row = 0; row <= size - win_length; row++)
-            score += evaluateLine(board, row, col, 1, 0);
-    
-    for (int row = 0; row <= size - win_length; row++)
-        for (int col = 0; col <= size - win_length; col++)
-            score += evaluateLine(board, row, col, 1, 1);
-       
-    for (int row = 0; row <= size - win_length; row++)
-        for (int col = win_length - 1; col < size; col++)
-            score += evaluateLine(board, row, col, 1, -1);
-    
-   
-    int center = size / 2;
-    for (int i = center - 1; i <= center + 1; i++)
-        for (int j = center - 1; j <= center + 1; j++)
-            if (i >= 0 && i < size && j >= 0 && j < size) 
-            {
-                if (board.getCell(i, j) == aiMark)
-                    score += 5;
-                else if (board.getCell(i, j) == playerMark)
-                    score -= 5;
-            }
-    
-    return score;
-}
-
-
-int MinimaxAI::evaluate(const Board& board) const 
-{
-    if (board.checkWin(aiMark, win_length))
-        return EngineConst::WIN_SCORE;
-    else if (board.checkWin(playerMark, win_length))
-        return EngineConst::LOSS_SCORE;
-   
-    return evaluatePosition(board);
-}
-
-
 int MinimaxAI::minimax(Board& board, int depth, int alpha, int beta,
                       bool maximizingPlayer) 
 {
     if (timeUp()) 
         return 0;
     
-    if (depth == 0 || isTerminal(board))
-        return evaluate(board);
+    if (depth == 0 || game->isTerminal(board))
+        return game->evaluate(board);
    
-    auto moves = getOrderedMoves(board, maximizingPlayer);
-    
+    auto moves = getOrderedMoves(board, maximizingPlayer);    
    
     if (maximizingPlayer) 
     {
@@ -245,7 +152,6 @@ int MinimaxAI::minimax(Board& board, int depth, int alpha, int beta,
         return minEval;
     }
 }
-
 
 std::pair<int, int> MinimaxAI::iterativeDeepening(Board& board) 
 {
@@ -307,7 +213,6 @@ std::pair<int, int> MinimaxAI::iterativeDeepening(Board& board)
     return bestMove;
 }
 
-
 std::pair<int, int> MinimaxAI::findBestMove(Board& board) 
 {   
     startTime = clock();
@@ -319,12 +224,12 @@ std::pair<int, int> MinimaxAI::findBestMove(Board& board)
         board.setCell(cell.first, cell.second, aiMark);
         if (board.checkWin(aiMark, win_length)) 
         {
-            board.setCell(cell.first, cell.second, emptyCell);
+            board.setCell(cell.first, cell.second, board.getEmpty());
             if (showThinking)
                 thinkingLog.push_back("[AI] Find wininng move!");
             return cell;
         }
-        board.setCell(cell.first, cell.second, emptyCell);
+        board.setCell(cell.first, cell.second, board.getEmpty());
     }
     
     for (const auto& cell : emptyCells) 
@@ -332,12 +237,12 @@ std::pair<int, int> MinimaxAI::findBestMove(Board& board)
         board.setCell(cell.first, cell.second, playerMark);
         if (board.checkWin(playerMark, win_length)) 
         {
-            board.setCell(cell.first, cell.second, emptyCell);
+            board.setCell(cell.first, cell.second, board.getEmpty());
             if (showThinking)
                 thinkingLog.push_back("[AI] Block player win!");
             return cell;
         }
-        board.setCell(cell.first, cell.second, emptyCell);
+        board.setCell(cell.first, cell.second, board.getEmpty());
     }
     
     std::pair<int, int> bestMove = iterativeDeepening(board);

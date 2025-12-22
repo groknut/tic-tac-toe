@@ -6,6 +6,9 @@
 #include <iostream>
 #include "minimax.h"
 #include "cfig.h"
+
+class Game;
+
 class Player
 {
 protected:
@@ -36,7 +39,7 @@ private:
     std::vector<std::string> lastThinkingLog;
     void sleep(int milliseconds);
 public:
-	AI(const char& c, const std::string& n, const Cfig& cfig);
+	AI(const char& c, const std::string& n, const Cfig& cfig, Game* game = nullptr);
 	bool makeMove(Board& board) override;
     void printThinkingLog();
     void clearLastLog() { lastThinkingLog.clear(); }

@@ -37,8 +37,8 @@ bool Human::makeMove(Board& board)
     return false;
 }
 
-AI::AI(const char& c, const std::string& n, const Cfig& cfig)
-	: Player(c, n), aiEngine(cfig) 
+AI::AI(const char& c, const std::string& n, const Cfig& cfig, Game* game)
+	: Player(c, n), aiEngine(cfig, game) 
 {
     if (cfig.has("debug"))
         sleep_time = cfig.get<int>("debug", "sleep", 0);
