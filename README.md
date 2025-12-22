@@ -15,8 +15,12 @@
     7. откатываем ход
     8. обновляем лучший ход
 
-![Структура проекта](./assets/structure.drawio.png)
-![Работа алгоритма](./assets/algorithm.drawio.png)
+<div align="center">
+<img src="./assets/structure.drawio.png" alt="Структура">
+</div>
+<div align="center">
+<img src="./assets/algorithm.drawio.png" alt="Алгоритм">
+</div>
 
 ### Начало работы
 1. Склонируйте проект
