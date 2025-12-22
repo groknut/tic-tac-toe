@@ -12,7 +12,7 @@ Game::Game(const Cfig& config)
 		player2 = new AI(
 			config.get<char>("player2", "mark", 'O'), 
 			config.get<std::string>("player2", "name", "AI"),
-			config
+			config, this
 		);
 	}
 	else if (config.get("player1", "type").toString() == std::string("human") && config.get("player2", "type").toString() == std::string("human"))
@@ -25,14 +25,17 @@ Game::Game(const Cfig& config)
         player1 = new AI(
 			config.get<char>("player1", "mark", 'O'), 
 			config.get<std::string>("player1", "name", "AI"),
-			config
+			config, this
 		);
         player2 = new AI(
 			config.get<char>("player2", "mark", 'O'), 
 			config.get<std::string>("player2", "name", "AI"),
-			config
+			config, this
 		);
     }
+
+    playerMark = player1->getMark();
+    aiMark = player2->getMark();
 
 	color = config.get<bool>("game", "color", false);
 
@@ -89,8 +92,8 @@ void Game::switchPlayer()
 
 char Game::getWinner() const
 {
-    if (checkWin(player1->getMark())) return player1->getMark();
-    if (checkWin(player2->getMark())) return player2->getMark();
+    if (checkWin(playerMark)) return playerMark;
+    if (checkWin(aiMark)) return aiMark;
     return ' ';
 }
 
@@ -99,9 +102,16 @@ bool Game::checkWin(const char& mark) const
     return board.checkWin(mark, win_length);
 }
 
+bool Game::isTerminal(const Board& board) const 
+{
+    return board.checkWin(aiMark, win_length) ||
+           board.checkWin(playerMark, win_length) ||
+           board.isFull();
+}
+
 bool Game::checkWin() const
 {
-    return checkWin(player1->getMark()) || checkWin(player2->getMark());
+    return checkWin(playerMark) || checkWin(aiMark);
 }
 
 void Game::printResult()
@@ -110,7 +120,7 @@ void Game::printResult()
     if (winner != ' ')
     {
     	printBoard();
-        std::string winnerName = (winner == player1->getMark()) ? player1->getName() : player2->getName();
+        std::string winnerName = (winner == playerMark) ? player1->getName() : player2->getName();
         std::cout << "Congratulations " << winnerName << "!\n";
     }
 }
@@ -154,4 +164,97 @@ void Game::run()
 		printBoard();
 		handleInput();
  	} while (!isOver());
+}
+
+
+
+int Game::evaluate(const Board& board) const
+{
+    if (board.checkWin(aiMark, win_length))
+        return EngineConst::WIN_SCORE;
+    else if (board.checkWin(playerMark, win_length))
+        return EngineConst::LOSS_SCORE;
+   
+    return evaluatePosition(board);
+}
+
+int Game::evaluateLine(const Board& board, std::pair<int, int> start, std::pair<int, int> delta) const 
+{    
+    int aiCount = 0, playerCount = 0, emptyCount = 0;
+    int size = board.getSize();
+    char emptyCell = board.getEmpty();
+    auto [startRow, startCol] = start;
+    auto [deltaRow, deltaCol] = delta;
+   
+    for (int i = 0; i < win_length; i++) 
+    {
+        int row = startRow + i * deltaRow;
+        int col = startCol + i * deltaCol;
+        char cell = board.getCell(row, col);
+        
+        if (cell == aiMark)
+            aiCount++;
+        else if (cell == playerMark)
+            playerCount++;
+        else if (cell == emptyCell)
+            emptyCount++;
+    }
+    
+    if (aiCount > 0 && playerCount > 0)
+        return 0;
+    
+    if (aiCount > 0 && playerCount == 0) {
+        int baseScore = EngineConst::LINE_SCORES[aiCount];
+
+        if (emptyCount > 0)
+            return baseScore + (emptyCount * 2);
+        return baseScore;
+    }
+    
+    if (playerCount > 0 && aiCount == 0) {
+        int baseScore = EngineConst::LINE_SCORES[playerCount];
+        
+        if (emptyCount > 0)
+            return -baseScore + (emptyCount * 2);
+        return -baseScore;
+    }
+    
+    return 0;
+}
+
+
+int Game::evaluatePosition(const Board& board) const 
+{
+    int size = board.getSize();
+    int score = 0;
+   
+    for (int row = 0; row < size; row++)
+        for (int col = 0; col <= size - win_length; col++)
+            score += evaluateLine(board, {row, col}, {0, 1});
+    
+    for (int col = 0; col < size; col++)
+        for (int row = 0; row <= size - win_length; row++)
+            score += evaluateLine(board, {row, col}, {1, 0});
+    
+    for (int row = 0; row <= size - win_length; row++)
+        for (int col = 0; col <= size - win_length; col++)
+            score += evaluateLine(board, {row, col}, {1, 1});
+       
+    for (int row = 0; row <= size - win_length; row++)
+        for (int col = win_length - 1; col < size; col++)
+            score += evaluateLine(board, {row, col}, {1, -1});
+    
+   
+    int center = size / 2;
+    for (int i = center - 1; i <= center + 1; i++)
+        for (int j = center - 1; j <= center + 1; j++)
+            if (i >= 0 && i < size && j >= 0 && j < size) 
+            {
+                if (board.getCell(i, j) == aiMark)
+                    score += 5;
+                else if (board.getCell(i, j) == playerMark)
+                    score -= 5;
+            }
+    
+    return score;
 }

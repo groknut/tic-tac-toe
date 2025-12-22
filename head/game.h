@@ -4,6 +4,8 @@
 #include "board.h"
 #include "player.h"
 #include "cfig.h"
+#include "engine_const.h"
+
 
 class Game
 {
@@ -15,7 +17,10 @@ private:
 	int win_length;
 	bool gameOver;
 	bool color;
-    bool clear_console;
+      bool clear_console;
+
+    char aiMark;
+    char playerMark;
 
 	bool checkWin(const char& mark) const;
 	bool checkWin() const;
@@ -30,6 +35,12 @@ public:
 	void handleInput();
 	bool isOver();
     void run();
+
+    int evaluate(const Board& board) const;
+    int evaluatePosition(const Board& board) const;
+    int evaluateLine(const Board& board, std::pair<int, int> start, std::pair<int, int> delta) const;
+
+    bool isTerminal(const Board& board) const;
 };
 
 #endif
